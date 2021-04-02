@@ -17,7 +17,7 @@ int LineNumber = 1;
 bool Editing = true;
 char UserInput[128];
 char* Tok;
-int Lines[100][2];
+int Lines[100];
 String FileBuffer;
 
 // size of user input string
@@ -45,23 +45,15 @@ int main(int argc, char** argv)
 		// storing newline character's index with the line number for later inserts
 		int Count = 1;
 		int prev;
-		Lines[0][0] = 1;
-		Lines[0][1] = 0;
+		Lines[0] = 1;
 		for (int i = 0; i < FileBuffer.Len; i++)
 		{
 			if (FileBuffer.Data[i] != '\n' && FileBuffer.Data[i] != '\0') continue; // ignore this iteration
 
-			Lines[Count][0] = i + 1;
-			Lines[Count - 1][1] = i - Lines[Count - 1][0];
-			if (Lines[Count - 1][1] == -1)
-			{
-				Lines[Count - 1][1] = 0;
-			}
+			Lines[Count] = i + 1;
 			Count++;
 			I = Count;
 		}
-
-		Lines[Count - 1][1] = FileBuffer.Len - 1 - Lines[Count - 1][0];
 
 		Count = 0;
 	}
@@ -108,7 +100,6 @@ int main(int argc, char** argv)
 				}
 				else {
 					String_append(&temp, inputSec);
-					String_fwrite_stdout(&temp);
 					// copying the user input into the FileBuffer
 				}
 			}
@@ -116,10 +107,11 @@ int main(int argc, char** argv)
 		}
 		else if (strcmp(Tok, "w") == 0)
 		{
+			printf("%s ---- %d\n", FileBuffer.Data, FileBuffer.Len);
 			String_fwrite(&FileBuffer, GivenFile);
 			printf("[%ld] bytes written to file.\n", FileBuffer.Len);
 		}
-		else if (strcmp(Tok, "r") == 0)
+		else if (strcmp(Tok, "rl") == 0)
 		{
 			int LINEchsn;
 			fputs(": ", stdout);
@@ -135,8 +127,8 @@ int main(int argc, char** argv)
 			else
 			{
 				LINEchsn -= 1;
-				INDEXchsn = Lines[LINEchsn][0];
-				INDEXend = Lines[LINEchsn + 1][0];
+				INDEXchsn = Lines[LINEchsn];
+				INDEXend = Lines[LINEchsn + 1];
 
 				char* lineBeginning = FileBuffer.Data + INDEXchsn - 1;
 				int count = 0;
@@ -149,10 +141,36 @@ int main(int argc, char** argv)
 
 				int lineLength = count;
 
-				memmove(lineBeginning, lineBeginning + lineLength, FileBuffer.Len - lineLength);
+				memmove(lineBeginning, lineBeginning + lineLength, FileBuffer.Len - (INDEXchsn + lineLength));
+				String_realloc(&FileBuffer, FileBuffer.Len - lineLength);
 			}
-			//			FileBuffer = realloc(FileBuffer, fileSize - lineLength);
 
+		}
+		else if(strcmp(Tok, "n")==0)
+		{
+			int Count = 1;
+			int prev;
+			Lines[0] = 1;
+			for (int i = 0; i < FileBuffer.Len; i++)
+			{
+				if (FileBuffer.Data[i] != '\n' && FileBuffer.Data[i] != '\0') continue; // ignore this iteration
+	
+				Lines[Count] = i + 1;
+				printf("%d, %d\n", i+1, i-Lines[Count-1]);
+				Count++;
+				I = Count;
+			}
+
+			Count = 0;
+	
+			for (int i=0; i<I;i++)
+			{
+				if(I>100)
+				{
+					break;
+				}
+				printf("%d - %d\n", i, Lines[i]);
+			}
 		}
 		
 	}
