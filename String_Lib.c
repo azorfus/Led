@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 #include "String_Lib.h"
@@ -35,7 +35,7 @@ void String_fread(String* str, FILE* source)
 	str->Len = fileSize + 1;
 	rewind(source);
 	fread(str->Data, 1, fileSize, source);
-//	str->Data[str->Len] = '\0';
+	//str->Data[str->Len]='\0';
 }
 
 void String_fwrite_stdout(String* str)
@@ -55,6 +55,10 @@ void String_append(String* str, const char* source)
 	char* end_of_dst = str->Data  + str->Len;
 	str->Len += source_len;
 	strcpy(end_of_dst, source);	
+
+	/* you can use this if you want:
+	 * memcpy(end_of_dst, str->Data, str->Len);
+	 */
 }
 
 void String_append_string(String* str, String* source)
@@ -63,6 +67,28 @@ void String_append_string(String* str, String* source)
 	char* end_of_dst = str->Data  + str->Len;
 	str->Len += source->Len;
 	strcpy(end_of_dst, source->Data);	
+}
+
+void String_remsubstr(String *str, const char *toRemove) {
+    if (NULL == (str->Data = strstr(str->Data, toRemove)))
+    {  
+        // no match.
+        printf("No match in %s\n", str);
+        return;
+    }
+
+    // str points to toRemove in str now.
+    const size_t remLen = strlen(toRemove);
+    char *copyEnd;
+    char *copyFrom = str->Data + remLen;
+    while (NULL != (copyEnd = strstr(copyFrom, toRemove)))
+    {  
+        // printf("match at %3ld in %s\n", copyEnd - str, str);
+        memmove(str->Data, copyFrom, copyEnd - copyFrom);
+        str->Data += copyEnd - copyFrom;
+        copyFrom = copyEnd + remLen;
+    }
+    memmove(str->Data, copyFrom, 1 + strlen(copyFrom));
 }
 
 void String_resize(String* str, size_t resize, char fill_char)
