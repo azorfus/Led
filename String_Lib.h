@@ -1,4 +1,4 @@
-﻿#ifndef STRING_LIB_H
+#ifndef STRING_LIB_H
 #define STRING_LIB_H
 
 #include <stdio.h>
@@ -19,6 +19,7 @@ void String_fwrite_stdout(String* str);
 void String_fwrite(String* str, FILE* dest);
 void String_append(String* str, const char* source);
 void String_append_string(String* str, String* source);
+void String_remsubstr(String *str, const char *toRemove);
 void String_resize(String* str, size_t newsize, char fill_char);
 void String_destroy(String* str);
 void trynow(String* str);
