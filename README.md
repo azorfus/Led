@@ -1,6 +1,6 @@
 # Led
 Line Editor based of Edlin a dos text editor
-
+With my own String library
 Commands:
 
 l; -- list file's content.
